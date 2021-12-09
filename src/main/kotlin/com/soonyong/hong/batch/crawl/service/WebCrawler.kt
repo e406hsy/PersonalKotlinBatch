@@ -5,15 +5,17 @@ import mu.KotlinLogging
 import org.jsoup.Jsoup
 import org.jsoup.nodes.Element
 import org.jsoup.select.Elements
+import org.springframework.stereotype.Service
 import java.io.IOException
 import java.util.*
 import java.util.stream.Collectors
 
 private val log = KotlinLogging.logger {}
 
+@Service
 class WebCrawler {
 
-    fun getText(target: CrawlTarget): List<String> {
+    fun getTexts(target: CrawlTarget): List<String> {
         try {
 
             log.info { "crawl target : $target" }
@@ -34,17 +36,5 @@ class WebCrawler {
             return Collections.emptyList();
         }
     }
+
 }
-/**
-return elements.stream()
-.filter { element: Element ->
-target.filter.isAllowed(
-element
-)
-}
-.map { element: Element ->
-element.let {
-when (
-}
-}
-.collect(Collectors.toList())**/

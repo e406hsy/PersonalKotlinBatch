@@ -1,9 +1,7 @@
 package com.soonyong.hong.batch.config.crawl
 
 import com.soonyong.hong.batch.crawl.model.CrawlTarget
-import org.jsoup.nodes.Element
 
-class CrawlTargetFactory
 
 private val crawlTargetMap: MutableMap<String, CrawlTarget> = HashMap<String, CrawlTarget>().apply {
     put(
@@ -12,7 +10,7 @@ private val crawlTargetMap: MutableMap<String, CrawlTarget> = HashMap<String, Cr
             title = "ppomppu",
             url = "https://www.ppomppu.co.kr/zboard/zboard.php?id=ppomppu&hotlist_flag=999",
             baseCssSelector = "#revolution_main_table > tbody > tr[align=\"center\"]",
-            filter = { element: Element -> true },
+            filter = { true },
 //                CrawlFilterChain.builder()
 //                    .delegate(
 //                        SelectedTextFilterAdapter.builder().cssSelector("td:nth-child(4) > nobr")

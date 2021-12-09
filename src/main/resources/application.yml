@@ -1,0 +1,8 @@
+
+logging:
+  level:
+    root: info
+    com:
+      soonyong: debug
+    org: 
+      springframework: info
