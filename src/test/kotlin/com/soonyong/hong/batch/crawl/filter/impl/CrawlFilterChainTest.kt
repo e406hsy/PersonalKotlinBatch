@@ -7,8 +7,8 @@ import org.junit.jupiter.api.DisplayName
 import org.junit.jupiter.api.Test
 
 class CrawlFilterChainTest {
-    var trueFilter = CrawlFilter { value: Element? -> true }
-    var falseFilter = CrawlFilter { value: Element? -> false }
+    var trueFilter = CrawlFilter { true }
+    var falseFilter = CrawlFilter { false }
 
     @Test
     @DisplayName("AND test (true, ture) -> true")
