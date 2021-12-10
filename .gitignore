@@ -36,4 +36,6 @@ out/
 ### VS Code ###
 .vscode/
 
-**/NotificationServiceTest.java
+### files with my personal secret properties ###
+**/src/main/resources/db.yml
+**/DoorayNotificationServiceTest.kt

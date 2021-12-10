@@ -1,76 +1,73 @@
 package com.soonyong.hong.batch.config.crawl
 
+import com.soonyong.hong.batch.crawl.filter.impl.CrawlFilterChain
+import com.soonyong.hong.batch.crawl.filter.impl.LocalTimeBaseStringComparator
+import com.soonyong.hong.batch.crawl.filter.impl.PatternMatchStringComparator
+import com.soonyong.hong.batch.crawl.filter.impl.SelectedTextFilterAdapter
 import com.soonyong.hong.batch.crawl.model.CrawlTarget
-import org.jsoup.nodes.Element
+import java.time.ZoneId
+import java.time.format.DateTimeFormatter
+import java.time.temporal.ChronoUnit
+import java.util.regex.Pattern
 
-class CrawlTargetFactory
 
 private val crawlTargetMap: MutableMap<String, CrawlTarget> = HashMap<String, CrawlTarget>().apply {
     put(
-        "ppomppu",
-        CrawlTarget(
+        "ppomppu", CrawlTarget(
             title = "ppomppu",
             url = "https://www.ppomppu.co.kr/zboard/zboard.php?id=ppomppu&hotlist_flag=999",
             baseCssSelector = "#revolution_main_table > tbody > tr[align=\"center\"]",
-            filter = { element: Element -> true },
-//                CrawlFilterChain.builder()
-//                    .delegate(
-//                        SelectedTextFilterAdapter.builder().cssSelector("td:nth-child(4) > nobr")
-//                            .delegate(value -> PatternMatchStringComparater.builder()
-//    .pattern(Pattern.compile("\\d\\d:\\d\\d:\\d\\d")).build()
-//    .and(
-//        LocalTimeBaseStringComparater.builder()
-//            .formatter(DateTimeFormatter.ofPattern("HH:mm:ss")).interval(8)
-//            .zoneId(ZoneId.of("Asia/Seoul")).unit(ChronoUnit.HOURS)
-//            .type(Type.BEFORE).build()
-//    )
-//    .test(value))
-//    .build())
-//    .delegateCondition(DelegateCondition.AND)
-//    .next(
-//        SelectedTextFilterAdapter.builder().cssSelector("td:nth-child(5)")
-//            .delegate(
-//                PatternMatchStringComparater.builder()
-//                    .pattern(Pattern.compile("(1[5-9]|[2-9]\\d)\\s*-\\s*0")).build()
-//            )
-//            .build()
-//    )
-//    .build())
+            filter = CrawlFilterChain(
+                delegate = SelectedTextFilterAdapter(
+                    cssSelector = "td:nth-child(4) > nobr", delegate = PatternMatchStringComparator(
+                        pattern = Pattern.compile("\\d\\d:\\d\\d:\\d\\d")
+                    ).and(
+                        LocalTimeBaseStringComparator(
+                            formatter = DateTimeFormatter.ofPattern("HH:mm:ss"),
+                            zoneId = ZoneId.of("Asia/Seoul"),
+                            unit = ChronoUnit.HOURS,
+                            interval = 8,
+                            type = LocalTimeBaseStringComparator.Type.BEFORE
+                        )
+                    )
+                ), delegateCondition = CrawlFilterChain.DelegateCondition.AND, next = SelectedTextFilterAdapter(
+                    cssSelector = "td:nth-child(5)", delegate = PatternMatchStringComparator(
+                        pattern = Pattern.compile("(1[5-9]|[2-9]\\d)\\s*-\\s*0")
+                    )
+                )
+            ),
             targetCssSelector = "td:nth-child(3) > table > tbody > tr > td:nth-child(2) > div > a > font"
         )
     )
-//    )
-//    add(
-//        CrawlTarget.builder().title("ppomppu_foreign")
-//            .url("https://www.ppomppu.co.kr/zboard/zboard.php?id=ppomppu4&hotlist_flag=999")
-//            .baseCssSeletor("#revolution_main_table > tbody > tr[align=\"center\"]")
-//            .filter(
-//                CrawlFilterChain.builder()
-//                    .delegate(
-//                        SelectedTextFilterAdapter.builder().cssSelector("td:nth-child(4) > nobr")
-//                            .delegate(value -> PatternMatchStringComparater.builder()
-//    .pattern(Pattern.compile("\\d\\d:\\d\\d:\\d\\d")).build()
-//    .and(
-//        LocalTimeBaseStringComparater.builder()
-//            .formatter(DateTimeFormatter.ofPattern("HH:mm:ss")).interval(8)
-//            .zoneId(ZoneId.of("Asia/Seoul")).unit(ChronoUnit.HOURS)
-//            .type(Type.BEFORE).build()
-//    )
-//    .test(value))
-//    .build())
-//    .delegateCondition(DelegateCondition.AND)
-//    .next(
-//        SelectedTextFilterAdapter.builder().cssSelector("td:nth-child(5)")
-//            .delegate(
-//                PatternMatchStringComparater.builder()
-//                    .pattern(Pattern.compile("\\d\\d\\s*-\\s*0")).build()
-//            )
-//            .build()
-//    )
-//    .build())
-//    .targetCssSeletor("td:nth-child(3) > table > tbody > tr > td:nth-child(2) > div > a > font").build());
+    put(
+        "ppomppu_foreign", CrawlTarget(
+            title = "ppomppu_foreign",
+            url = "https://www.ppomppu.co.kr/zboard/zboard.php?id=ppomppu4&hotlist_flag=999",
+            baseCssSelector = "#revolution_main_table > tbody > tr[align=\"center\"]",
+            filter = CrawlFilterChain(
+                delegate = SelectedTextFilterAdapter(
+                    cssSelector = "td:nth-child(4) > nobr", delegate = PatternMatchStringComparator(
+                        pattern = Pattern.compile("\\d\\d:\\d\\d:\\d\\d")
+                    ).and(
+                        LocalTimeBaseStringComparator(
+                            formatter = DateTimeFormatter.ofPattern("HH:mm:ss"),
+                            zoneId = ZoneId.of("Asia/Seoul"),
+                            unit = ChronoUnit.HOURS,
+                            interval = 8,
+                            type = LocalTimeBaseStringComparator.Type.BEFORE
+                        )
+                    )
+                ), delegateCondition = CrawlFilterChain.DelegateCondition.AND, next = SelectedTextFilterAdapter(
+                    cssSelector = "td:nth-child(5)", delegate = PatternMatchStringComparator(
+                        pattern = Pattern.compile("\\d\\d\\s*-\\s*0")
+                    )
+                )
+            ),
+            targetCssSelector = "td:nth-child(3) > table > tbody > tr > td:nth-child(2) > div > a > font"
+        )
+    )
 }
 
-fun get(title: String): CrawlTarget? {
+fun getCrawlTarget(title: String): CrawlTarget? {
     return crawlTargetMap[title]
 }
