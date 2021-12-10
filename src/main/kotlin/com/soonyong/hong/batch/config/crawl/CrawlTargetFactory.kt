@@ -10,7 +10,6 @@ import java.time.format.DateTimeFormatter
 import java.time.temporal.ChronoUnit
 import java.util.regex.Pattern
 
-
 private val crawlTargetMap: MutableMap<String, CrawlTarget> = HashMap<String, CrawlTarget>().apply {
     put(
         "ppomppu", CrawlTarget(
@@ -18,30 +17,33 @@ private val crawlTargetMap: MutableMap<String, CrawlTarget> = HashMap<String, Cr
             url = "https://www.ppomppu.co.kr/zboard/zboard.php?id=ppomppu&hotlist_flag=999",
             baseCssSelector = "#revolution_main_table > tbody > tr[align=\"center\"]",
             filter = CrawlFilterChain(
-                delegate = CrawlFilterChain(
-                    delegate = SelectedTextFilterAdapter(
-                        cssSelector = "td:nth-child(4) > nobr", comparator = PatternMatchStringComparator(
-                            pattern = Pattern.compile("\\d\\d:\\d\\d:\\d\\d")
-                        ).and(
-                            LocalTimeBaseStringComparator(
-                                formatter = DateTimeFormatter.ofPattern("HH:mm:ss"),
-                                zoneId = ZoneId.of("Asia/Seoul"),
-                                unit = ChronoUnit.HOURS,
-                                interval = 8,
-                                type = LocalTimeBaseStringComparator.Type.BEFORE
+                delegate = SelectedTextFilterAdapter(
+                    comparator = PatternMatchStringComparator(
+                        pattern = Pattern.compile("^((?!/zboard/skin/DQ_Revolution_BBS_New1/end_icon\\.PNG).)*$")
+                    )
+                ), delegateCondition = CrawlFilterChain.DelegateCondition.AND, next = CrawlFilterChain(
+                    delegate = CrawlFilterChain(
+                        delegate = SelectedTextFilterAdapter(
+                            cssSelector = "td:nth-child(4) > nobr", comparator = PatternMatchStringComparator(
+                                pattern = Pattern.compile("\\d\\d:\\d\\d:\\d\\d")
+                            ).and(
+                                LocalTimeBaseStringComparator(
+                                    formatter = DateTimeFormatter.ofPattern("HH:mm:ss"),
+                                    zoneId = ZoneId.of("Asia/Seoul"),
+                                    unit = ChronoUnit.HOURS,
+                                    interval = 8,
+                                    type = LocalTimeBaseStringComparator.Type.BEFORE
+                                )
+                            )
+                        ), delegateCondition = CrawlFilterChain.DelegateCondition.AND, next = SelectedTextFilterAdapter(
+                            cssSelector = "td:nth-child(5)", comparator = PatternMatchStringComparator(
+                                pattern = Pattern.compile("(1[5-9]|[2-9]\\d)\\s*-\\s*0")
                             )
                         )
-                    ), delegateCondition = CrawlFilterChain.DelegateCondition.AND, next = SelectedTextFilterAdapter(
+                    ), delegateCondition = CrawlFilterChain.DelegateCondition.OR, next = SelectedTextFilterAdapter(
                         cssSelector = "td:nth-child(5)", comparator = PatternMatchStringComparator(
-                            pattern = Pattern.compile("(1[5-9]|[2-9]\\d)\\s*-\\s*0")
+                            pattern = Pattern.compile("([3-9]|\\d{2,})\\d\\s*-\\s*0")
                         )
-                    )
-                ),
-                delegateCondition = CrawlFilterChain.DelegateCondition.OR,
-                next = SelectedTextFilterAdapter(
-                    cssSelector = "td:nth-child(5)",
-                    comparator = PatternMatchStringComparator(
-                        pattern = Pattern.compile("([3-9]|\\d{2,})\\d\\s*-\\s*0")
                     )
                 )
             ),
