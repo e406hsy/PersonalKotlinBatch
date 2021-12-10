@@ -38,4 +38,4 @@ out/
 
 ### files with my personal secret properties ###
 **/src/main/resources/db.yml
-**/NotificationServiceTest.java
+**/DoorayNotificationServiceTest.kt

@@ -18,7 +18,7 @@ class WebCrawlerTest {
 
     @Test
     fun getTexts() {
-        val target: CrawlTarget? = com.soonyong.hong.batch.config.crawl.get("ppomppu")
+        val target: CrawlTarget? = com.soonyong.hong.batch.config.crawl.getCrawlTarget("ppomppu")
         requireNotNull(target)
         val results: List<String> = webCrawler.getTexts(target)
         log.debug { "result $results" }
