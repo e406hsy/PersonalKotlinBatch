@@ -1,17 +1,17 @@
-package com.soonyong.hong.batch.notification.dooray.service
+package com.soonyong.hong.batch.notification.push.service
 
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.fasterxml.jackson.module.kotlin.KotlinFeature
 import com.fasterxml.jackson.module.kotlin.KotlinModule
 import com.soonyong.hong.batch.notification.NotificationService
-import com.soonyong.hong.batch.notification.dooray.model.DoorayNotificationRequest
+import com.soonyong.hong.batch.notification.push.model.FireBaseAndroidPushNotificationBody
+import com.soonyong.hong.batch.notification.push.model.FireBaseAndroidPushNotificationRequest
 import mu.KotlinLogging
 import org.apache.http.HttpException
 import org.apache.http.client.methods.HttpPost
 import org.apache.http.entity.StringEntity
 import org.apache.http.impl.client.HttpClients
 import org.springframework.stereotype.Service
-import java.io.IOException
 import java.nio.charset.Charset
 
 private val log = KotlinLogging.logger {}
@@ -22,17 +22,21 @@ private val objectMapper = ObjectMapper().apply {
 }
 
 @Service
-class DoorayNotificationService : NotificationService {
-
-    @Throws(IOException::class, HttpException::class)
-    override fun notify(hookUrl: String, message: String) {
+class FireBaseAndroidPushNotificationService : NotificationService {
+    override fun notify(authorizationKey: String, message: String) {
         log.info { "notification requested with message $message" }
         HttpClients.createMinimal().use { httpClient ->
-            val httpPost = HttpPost(hookUrl).apply {
+            val httpPost = HttpPost("https://fcm.googleapis.com/fcm/send").apply {
                 addHeader("Content-Type", "application/json")
+                addHeader("Authorization", "key=${authorizationKey}")
                 entity = StringEntity(
-                    objectMapper.writeValueAsString(DoorayNotificationRequest(botName = "My Noti", text = message)),
-                    Charset.forName("UTF-8")
+                    objectMapper.writeValueAsString(
+                        FireBaseAndroidPushNotificationRequest(
+                            notification = FireBaseAndroidPushNotificationBody(
+                                body = message, title = "My Noti"
+                            )
+                        )
+                    ), Charset.forName("UTF-8")
                 )
             }
             httpClient.execute(httpPost).use { httpResponse ->
@@ -42,4 +46,5 @@ class DoorayNotificationService : NotificationService {
             }
         }
     }
+
 }

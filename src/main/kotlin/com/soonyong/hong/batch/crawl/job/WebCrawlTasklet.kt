@@ -1,7 +1,7 @@
 package com.soonyong.hong.batch.crawl.job
 
 import com.soonyong.hong.batch.crawl.service.CrawlService
-import com.soonyong.hong.batch.notification.dooray.service.DoorayNotificationService
+import com.soonyong.hong.batch.notification.NotificationService
 import mu.KotlinLogging
 import org.springframework.batch.core.StepContribution
 import org.springframework.batch.core.configuration.annotation.StepScope
@@ -17,7 +17,9 @@ private val log = KotlinLogging.logger {}
 @StepScope
 @Component
 class WebCrawlTasklet(
-    private val crawlService: CrawlService, private val doorayNotificationService: DoorayNotificationService
+    private val crawlService: CrawlService,
+    private val doorayNotificationService: NotificationService,
+    private val fireBaseAndroidPushNotificationService: NotificationService
 ) : Tasklet {
 
     @Value("#{jobParameters[title]}")
@@ -26,14 +28,23 @@ class WebCrawlTasklet(
     @Value("#{jobParameters[hookUrl]}")
     private lateinit var hookUrl: String
 
+    @Value("#{jobParameters[fireBaseAuthorizationKey]}")
+    private lateinit var fireBaseAuthorizationKey: String
+
     override fun execute(contribution: StepContribution, chunkContext: ChunkContext): RepeatStatus {
-        val result: List<String> = crawlService.getTexts(title)
+        val results: List<String> = crawlService.getTexts(title)
 
-        log.info("crawl result : {}", result)
+        log.info("crawl result : {}", results)
 
-        if (result.isNotEmpty() && this::hookUrl.isInitialized && StringUtils.hasText(hookUrl)) {
-
-            doorayNotificationService.notify(hookUrl, result.joinToString("\n"))
+        if (results.isNotEmpty()) {
+            if (this::hookUrl.isInitialized && StringUtils.hasText(hookUrl)) {
+                doorayNotificationService.notify(hookUrl, results.joinToString("\n"))
+            }
+            if (this::fireBaseAuthorizationKey.isInitialized && StringUtils.hasText(fireBaseAuthorizationKey)) {
+                results.forEach { result ->
+                    fireBaseAndroidPushNotificationService.notify(fireBaseAuthorizationKey, result)
+                }
+            }
         }
         return RepeatStatus.FINISHED
     }
