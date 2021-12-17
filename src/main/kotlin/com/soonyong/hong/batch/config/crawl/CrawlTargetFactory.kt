@@ -98,8 +98,8 @@ private val crawlTargetMap: MutableMap<String, CrawlTarget> = HashMap<String, Cr
         )
     )
     put(
-        "qusarzone", CrawlTarget(
-            title = "qusarzone",
+        "quasarzone", CrawlTarget(
+            title = "quasarzone",
             url = "https://quasarzone.com/bbs/qb_saleinfo?popularity=Y",
             baseCssSelector = "#frmSearch > div > div.list-board-wrap > div.market-type-list.market-info-type-list.relative > table > tbody > tr",
             filter = CrawlFilterChain(
