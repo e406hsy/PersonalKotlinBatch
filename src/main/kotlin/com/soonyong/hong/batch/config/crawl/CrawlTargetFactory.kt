@@ -44,7 +44,9 @@ private val crawlTargetMap: MutableMap<String, CrawlTarget> = HashMap<String, Cr
                     )
                 )
             ),
-            targetCssSelector = "td:nth-child(3) > table > tbody > tr > td:nth-child(2) > div > a > font"
+            targetTextSelector = CssSelectorTargetTextSelector(
+                "td:nth-child(3) > table > tbody > tr > td:nth-child(2) > div > a > font"
+            )
         )
     )
     put(
@@ -89,7 +91,7 @@ private val crawlTargetMap: MutableMap<String, CrawlTarget> = HashMap<String, Cr
                     )
                 )
             ),
-            targetCssSelector = "td:nth-child(3) > table > tbody > tr > td:nth-child(2) > div > a > font"
+            targetTextSelector = CssSelectorTargetTextSelector("td:nth-child(3) > table > tbody > tr > td:nth-child(2) > div > a > font")
         )
     )
 }
