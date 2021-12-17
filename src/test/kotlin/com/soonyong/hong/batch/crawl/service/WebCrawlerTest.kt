@@ -9,16 +9,13 @@ import org.springframework.test.context.ActiveProfiles
 
 private val log = KotlinLogging.logger {}
 
-@SpringBootTest
-@ActiveProfiles("test")
 class WebCrawlerTest {
 
-    @Autowired
-    lateinit var webCrawler: WebCrawler
+    val webCrawler: WebCrawler = WebCrawler()
 
     @Test
     fun getTexts() {
-        val target: CrawlTarget? = com.soonyong.hong.batch.config.crawl.getCrawlTarget("ppomppu")
+        val target: CrawlTarget? = com.soonyong.hong.batch.config.crawl.getCrawlTarget("qusarzone")
         requireNotNull(target)
         val results: List<String> = webCrawler.getTexts(target)
         log.debug { "result $results" }
