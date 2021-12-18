@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.ObjectMapper
 import com.fasterxml.jackson.module.kotlin.KotlinFeature
 import com.fasterxml.jackson.module.kotlin.KotlinModule
 import com.soonyong.hong.batch.notification.NotificationService
+import com.soonyong.hong.batch.notification.model.NotificationMessage
 import com.soonyong.hong.batch.notification.push.model.FireBaseAndroidPushNotificationBody
 import com.soonyong.hong.batch.notification.push.model.FireBaseAndroidPushNotificationRequest
 import mu.KotlinLogging
@@ -23,17 +24,17 @@ private val objectMapper = ObjectMapper().apply {
 
 @Service
 class FireBaseAndroidPushNotificationService : NotificationService {
-    override fun notify(authorizationKey: String, message: String) {
+    override fun notify(sendKey: String, message: NotificationMessage) {
         log.info { "notification requested with message $message" }
         HttpClients.createMinimal().use { httpClient ->
             val httpPost = HttpPost("https://fcm.googleapis.com/fcm/send").apply {
                 addHeader("Content-Type", "application/json")
-                addHeader("Authorization", "key=${authorizationKey}")
+                addHeader("Authorization", "key=${sendKey}")
                 entity = StringEntity(
                     objectMapper.writeValueAsString(
                         FireBaseAndroidPushNotificationRequest(
                             notification = FireBaseAndroidPushNotificationBody(
-                                body = message, title = "My Noti"
+                                body = message.body, title = message.title
                             )
                         )
                     ), Charset.forName("UTF-8")

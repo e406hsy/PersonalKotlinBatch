@@ -6,9 +6,9 @@ import org.junit.jupiter.api.Test
 
 private val log = KotlinLogging.logger {}
 
-class WebCrawlerTest {
+internal class WebCrawlerTest {
 
-    val webCrawler: WebCrawler = WebCrawler()
+    private val webCrawler: WebCrawler = WebCrawler()
 
     @Test
     fun getTexts() {

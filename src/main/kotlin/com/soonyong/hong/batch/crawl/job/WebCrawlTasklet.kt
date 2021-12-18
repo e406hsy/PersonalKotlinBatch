@@ -2,6 +2,7 @@ package com.soonyong.hong.batch.crawl.job
 
 import com.soonyong.hong.batch.crawl.service.CrawlService
 import com.soonyong.hong.batch.notification.NotificationService
+import com.soonyong.hong.batch.notification.model.NotificationMessage
 import mu.KotlinLogging
 import org.springframework.batch.core.StepContribution
 import org.springframework.batch.core.configuration.annotation.StepScope
@@ -38,11 +39,15 @@ class WebCrawlTasklet(
 
         if (results.isNotEmpty()) {
             if (this::hookUrl.isInitialized && StringUtils.hasText(hookUrl)) {
-                doorayNotificationService.notify(hookUrl, results.joinToString("\n"))
+                doorayNotificationService.notify(
+                    hookUrl, NotificationMessage(title = this.title, body = results.joinToString("\n"))
+                )
             }
             if (this::fireBaseAuthorizationKey.isInitialized && StringUtils.hasText(fireBaseAuthorizationKey)) {
                 results.forEach { result ->
-                    fireBaseAndroidPushNotificationService.notify(fireBaseAuthorizationKey, result)
+                    fireBaseAndroidPushNotificationService.notify(
+                        fireBaseAuthorizationKey, NotificationMessage(title = this.title, body = result)
+                    )
                 }
             }
         }
