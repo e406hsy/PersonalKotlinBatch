@@ -1,84 +1,75 @@
 package com.soonyong.hong.batch.crawl.filter.impl
 
 import com.soonyong.hong.batch.crawl.filter.CrawlFilter
+import io.kotest.core.spec.style.AnnotationSpec
+import io.kotest.matchers.shouldBe
 import org.jsoup.nodes.Element
-import org.junit.jupiter.api.Assertions
-import org.junit.jupiter.api.DisplayName
-import org.junit.jupiter.api.Test
 
-class CrawlFilterChainTest {
+class CrawlFilterChainTest : AnnotationSpec() {
     private val trueFilter = CrawlFilter { true }
     private val falseFilter = CrawlFilter { false }
 
     @Test
-    @DisplayName("AND test (true, ture) -> true")
-    fun andTest1() {
+    fun `AND test (true, ture) then true`() {
         val crawlFilterChain = CrawlFilterChain(
             delegate = trueFilter, delegateCondition = CrawlFilterChain.DelegateCondition.AND, next = trueFilter
         )
-        Assertions.assertTrue(crawlFilterChain.isAllowed(Element("h1")))
+        crawlFilterChain.isAllowed(Element("h1")) shouldBe true
     }
 
     @Test
-    @DisplayName("AND test (true, false) -> false")
-    fun andTest2() {
+    fun `AND test (true, false) then false`() {
         val crawlFilterChain = CrawlFilterChain(
             delegate = trueFilter, delegateCondition = CrawlFilterChain.DelegateCondition.AND, next = falseFilter
         )
-        Assertions.assertFalse(crawlFilterChain.isAllowed(Element("h1")))
+        crawlFilterChain.isAllowed(Element("h1")) shouldBe false
     }
 
     @Test
-    @DisplayName("AND test (false, ture) -> false")
-    fun andTest3() {
+    fun `AND test (false, ture) then false`() {
         val crawlFilterChain = CrawlFilterChain(
             delegate = falseFilter, delegateCondition = CrawlFilterChain.DelegateCondition.AND, next = trueFilter
         )
-        Assertions.assertFalse(crawlFilterChain.isAllowed(Element("h1")))
+        crawlFilterChain.isAllowed(Element("h1")) shouldBe false
     }
 
     @Test
-    @DisplayName("AND test (false, false) -> false")
-    fun andTest4() {
+    fun `AND test (false, false) then false`() {
         val crawlFilterChain = CrawlFilterChain(
             delegate = falseFilter, delegateCondition = CrawlFilterChain.DelegateCondition.AND, next = falseFilter
         )
-        Assertions.assertFalse(crawlFilterChain.isAllowed(Element("h1")))
+        crawlFilterChain.isAllowed(Element("h1")) shouldBe false
     }
 
     @Test
-    @DisplayName("OR test (true, false) -> true")
-    fun orTest1() {
+    fun `OR test (true, false) then true`() {
         val crawlFilterChain = CrawlFilterChain(
             delegate = trueFilter, delegateCondition = CrawlFilterChain.DelegateCondition.OR, next = falseFilter
         )
-        Assertions.assertTrue(crawlFilterChain.isAllowed(Element("h1")))
+        crawlFilterChain.isAllowed(Element("h1")) shouldBe true
     }
 
     @Test
-    @DisplayName("OR test (false, ture) -> true")
-    fun orTest2() {
+    fun `OR test (false, ture) then true`() {
         val crawlFilterChain = CrawlFilterChain(
             delegate = falseFilter, delegateCondition = CrawlFilterChain.DelegateCondition.OR, next = trueFilter
         )
-        Assertions.assertTrue(crawlFilterChain.isAllowed(Element("h1")))
+        crawlFilterChain.isAllowed(Element("h1")) shouldBe true
     }
 
     @Test
-    @DisplayName("OR test (false, false) -> false")
-    fun orTest3() {
+    fun `OR test (false, false) then false`() {
         val crawlFilterChain = CrawlFilterChain(
             delegate = falseFilter, delegateCondition = CrawlFilterChain.DelegateCondition.OR, next = falseFilter
         )
-        Assertions.assertFalse(crawlFilterChain.isAllowed(Element("h1")))
+        crawlFilterChain.isAllowed(Element("h1")) shouldBe false
     }
 
     @Test
-    @DisplayName("OR test (true, ture) -> true")
-    fun orTest4() {
+    fun `OR test (true, ture) then true`() {
         val crawlFilterChain = CrawlFilterChain(
             delegate = trueFilter, delegateCondition = CrawlFilterChain.DelegateCondition.OR, next = trueFilter
         )
-        Assertions.assertTrue(crawlFilterChain.isAllowed(Element("h1")))
+        crawlFilterChain.isAllowed(Element("h1")) shouldBe true
     }
 }

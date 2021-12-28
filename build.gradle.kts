@@ -48,6 +48,7 @@ dependencies {
     implementation("io.github.microutils:kotlin-logging:1.12.5")
 
     /** test **/
+    testImplementation ("io.kotest:kotest-runner-junit5:5.0.2")
     testImplementation("org.springframework.boot:spring-boot-starter-test")
     testImplementation("org.springframework.batch:spring-batch-test")
     testImplementation("com.h2database:h2")
