@@ -31,7 +31,7 @@ private val crawlTargetMap: MutableMap<String, CrawlTarget> = HashMap<String, Cr
                     )
                 )
             ),
-            targetCssSelector = ".deal-title .item-name, .deal-price-info"
+            targetTextSelector = CssSelectorTargetTextSelector(".deal-title .item-name, .deal-price-info")
         )
     )
 
