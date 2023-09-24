@@ -29,7 +29,7 @@ class WebCrawlTasklet(
   @Value("#{jobParameters[key]}")
   private lateinit var key: String
 
-  @Value("#{jobParameters[type]")
+  @Value("#{jobParameters[type]}")
   private lateinit var type: NotificationType
 
   override fun execute(contribution: StepContribution, chunkContext: ChunkContext): RepeatStatus {
