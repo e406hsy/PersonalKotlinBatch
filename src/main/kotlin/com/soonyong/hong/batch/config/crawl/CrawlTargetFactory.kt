@@ -9,6 +9,30 @@ import java.util.regex.Pattern
 
 private val crawlTargetMap: MutableMap<String, CrawlTarget> = HashMap<String, CrawlTarget>().apply {
     put(
+        "gift-certificates", CrawlTarget(
+            title = "gift-certificates",
+            url = "https://www.algumon.com/category/5",
+            baseCssSelector = ".main .product .product-body",
+            filter = CrawlFilterChain(
+                delegate = SelectedTextFilterAdapter(
+                    cssSelector = ".deal-title .item-name",
+                    comparator = PatternMatchStringComparator(
+                        pattern = Pattern.compile("컬쳐랜드|문화상품권|해피머니|북앤라이프")
+                    )
+                ),
+                delegateCondition = CrawlFilterChain.DelegateCondition.AND,
+                next = SelectedTextFilterAdapter(
+                    cssSelector = ".product-body .product-price",
+                    comparator = PatternMatchStringComparator(
+                        pattern = Pattern.compile("(46,?[01][0-9]{2}|46,?200)원")
+                    )
+                )
+            ),
+            targetCssSelector = ".deal-title .item-name, .deal-price-info"
+        )
+    )
+
+    put(
         "ppomppu", CrawlTarget(
             title = "ppomppu",
             url = "https://www.ppomppu.co.kr/zboard/zboard.php?id=ppomppu&hotlist_flag=999",
