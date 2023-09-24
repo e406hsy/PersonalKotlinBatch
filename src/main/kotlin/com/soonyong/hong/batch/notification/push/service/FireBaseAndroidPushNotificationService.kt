@@ -3,8 +3,8 @@ package com.soonyong.hong.batch.notification.push.service
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.fasterxml.jackson.module.kotlin.KotlinFeature
 import com.fasterxml.jackson.module.kotlin.KotlinModule
-import com.soonyong.hong.batch.notification.NotificationService
-import com.soonyong.hong.batch.notification.model.NotificationMessage
+import com.soonyong.hong.batch.notification.domain.NotificationService
+import com.soonyong.hong.batch.notification.domain.model.NotificationMessage
 import com.soonyong.hong.batch.notification.push.model.FireBaseAndroidPushNotificationBody
 import com.soonyong.hong.batch.notification.push.model.FireBaseAndroidPushNotificationRequest
 import mu.KotlinLogging
