@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.ObjectMapper
 import com.fasterxml.jackson.module.kotlin.KotlinFeature
 import com.fasterxml.jackson.module.kotlin.KotlinModule
 import com.soonyong.hong.batch.notification.domain.NotificationService
+import com.soonyong.hong.batch.notification.domain.model.NotificationMessage
 import com.soonyong.hong.batch.notification.gotify.model.GotifyMessage
 import mu.KotlinLogging
 import org.apache.http.HttpException
@@ -26,7 +27,7 @@ private val objectMapper = ObjectMapper().apply {
 class GotifyNotificationService : NotificationService {
 
   @Throws(IOException::class, HttpException::class)
-  override fun notify(url: String, title: String, message: String) {
+  override fun notify(url: String, message: NotificationMessage) {
     log.info { "notification requested with message $message" }
     HttpClients.createMinimal().use { httpClient ->
       val httpPost = HttpPost(url).apply {
@@ -34,7 +35,7 @@ class GotifyNotificationService : NotificationService {
         entity = StringEntity(
           objectMapper.writeValueAsString(
             GotifyMessage(
-              title = title, message = message
+              title = message.title, message = message.body
             )
           ), Charset.forName("UTF-8")
         )
