@@ -31,10 +31,13 @@ class WebCrawlTasklet(
     @Value("#{jobParameters[type]")
     private lateinit var type: NotificationType
 
-    override fun execute(contribution: StepContribution, chunkContext: ChunkContext): RepeatStatus {
-        val result: List<String> = crawlService.getTexts(title)
+    @Value("#{jobParameters[fireBaseAuthorizationKey]}")
+    private lateinit var fireBaseAuthorizationKey: String
 
-        log.info("crawl result : {}", result)
+    override fun execute(contribution: StepContribution, chunkContext: ChunkContext): RepeatStatus {
+        val results: List<String> = crawlService.getTexts(title)
+
+        log.info("crawl result : {}", results)
 
         if (result.isNotEmpty() && this::url.isInitialized && this::type.isInitialized && StringUtils.hasText(
                 url

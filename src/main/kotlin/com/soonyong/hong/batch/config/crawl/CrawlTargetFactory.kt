@@ -2,8 +2,11 @@ package com.soonyong.hong.batch.config.crawl
 
 import com.soonyong.hong.batch.crawl.filter.impl.*
 import com.soonyong.hong.batch.crawl.model.CrawlTarget
+import java.time.LocalDate
 import java.time.ZoneId
 import java.time.format.DateTimeFormatter
+import java.time.format.DateTimeFormatterBuilder
+import java.time.temporal.ChronoField
 import java.time.temporal.ChronoUnit
 import java.util.regex.Pattern
 
@@ -68,7 +71,9 @@ private val crawlTargetMap: MutableMap<String, CrawlTarget> = HashMap<String, Cr
                     )
                 )
             ),
-            targetCssSelector = "td:nth-child(3) > table > tbody > tr > td:nth-child(2) > div > a > font"
+            targetTextSelector = CssSelectorTargetTextSelector(
+                "td:nth-child(3) > table > tbody > tr > td:nth-child(2) > div > a > font"
+            )
         )
     )
     put(
@@ -113,7 +118,70 @@ private val crawlTargetMap: MutableMap<String, CrawlTarget> = HashMap<String, Cr
                     )
                 )
             ),
-            targetCssSelector = "td:nth-child(3) > table > tbody > tr > td:nth-child(2) > div > a > font"
+            targetTextSelector = CssSelectorTargetTextSelector("td:nth-child(3) > table > tbody > tr > td:nth-child(2) > div > a > font")
+        )
+    )
+    put(
+        "quasarzone", CrawlTarget(
+            title = "quasarzone",
+            url = "https://quasarzone.com/bbs/qb_saleinfo?popularity=Y",
+            baseCssSelector = "#frmSearch > div > div.list-board-wrap > div.market-type-list.market-info-type-list.relative > table > tbody > tr",
+            filter = CrawlFilterChain(
+                delegate = SelectedTextFilterAdapter(
+                    comparator = PatternMatchStringComparator(
+                        pattern = Pattern.compile("^((?!종료).)*$")
+                    )
+                ), delegateCondition = CrawlFilterChain.DelegateCondition.AND, next = CrawlFilterChain(
+                    delegate = SelectedTextFilterAdapter(
+                        cssSelector = "span.date", comparator = PatternMatchStringComparator(
+                            pattern = Pattern.compile("\\d\\d:\\d\\d")
+                        ).and(
+                            LocalTimeBaseStringComparator(
+                                formatter = DateTimeFormatter.ofPattern("HH:mm"),
+                                zoneId = ZoneId.of("Asia/Seoul"),
+                                unit = ChronoUnit.HOURS,
+                                interval = 8,
+                                type = LocalTimeBaseStringComparator.Type.BEFORE
+                            )
+                        )
+                    ), delegateCondition = CrawlFilterChain.DelegateCondition.OR, next = CrawlFilterChain(
+                        delegate = SelectedTextFilterAdapter(
+                            cssSelector = "td:nth-child(1) > span", comparator = PatternMatchStringComparator(
+                                pattern = Pattern.compile("([3-9]|\\d\\d)\\d+")
+                            )
+                        ), delegateCondition = CrawlFilterChain.DelegateCondition.AND, next = CrawlFilterChain(
+                            delegate = SelectedTextFilterAdapter(
+                                cssSelector = "span.date", comparator = PatternMatchStringComparator(
+                                    pattern = Pattern.compile("\\d\\d-\\d\\d")
+                                ).and(
+                                    LocalDateBaseStringComparator(
+                                        formatter = DateTimeFormatterBuilder().appendPattern("MM-dd").parseDefaulting(
+                                            ChronoField.YEAR, LocalDate.now().minusDays(1).year.toLong()
+                                        ).toFormatter(),
+                                        zoneId = ZoneId.of("Asia/Seoul"),
+                                        unit = ChronoUnit.DAYS,
+                                        interval = 1,
+                                        type = LocalDateBaseStringComparator.Type.EQUALS
+                                    )
+                                )
+                            ),
+                            delegateCondition = CrawlFilterChain.DelegateCondition.OR,
+                            next = SelectedTextFilterAdapter(
+                                cssSelector = "span.date", comparator = PatternMatchStringComparator(
+                                    pattern = Pattern.compile("\\d\\d:\\d\\d")
+                                )
+                            )
+                        )
+                    )
+                )
+            ),
+            targetTextSelector = CompositeTargetTextSelector(
+                delegate = CssSelectorTargetTextSelector(".market-info-list-cont > p > a > span"),
+                delimiter = " | ",
+                next = CssSelectorTargetTextSelector(
+                    "span.text-orange"
+                )
+            )
         )
     )
 }

@@ -22,8 +22,8 @@ class WebCrawler {
             val elements: Elements = document.select(target.baseCssSelector)
 
             elements.filter { element: Element -> target.filter.isAllowed(element) }.map { element: Element ->
-                    target.targetCssSelector?.let { element.select(it).text() } ?: element.text()
-                }
+                target.targetTextSelector.filterText(element)
+            }
 
         } catch (e: IOException) {
             Collections.emptyList()
