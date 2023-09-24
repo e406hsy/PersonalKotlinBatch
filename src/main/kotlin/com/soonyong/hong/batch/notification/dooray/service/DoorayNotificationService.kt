@@ -3,6 +3,7 @@ package com.soonyong.hong.batch.notification.dooray.service
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.fasterxml.jackson.module.kotlin.KotlinFeature
 import com.fasterxml.jackson.module.kotlin.KotlinModule
+import com.soonyong.hong.batch.notification.domain.NotificationService
 import com.soonyong.hong.batch.notification.dooray.model.DoorayNotificationRequest
 import mu.KotlinLogging
 import org.apache.http.HttpException
@@ -21,17 +22,21 @@ private val objectMapper = ObjectMapper().apply {
 }
 
 @Service
-class DoorayNotificationService {
+class DoorayNotificationService : NotificationService {
 
     @Throws(IOException::class, HttpException::class)
-    fun notify(hookUrl: String, message: String) {
+    override fun notify(url: String, title: String, message: String) {
         log.info { "notification requested with message $message" }
         HttpClients.createMinimal().use { httpClient ->
-            val httpPost = HttpPost(hookUrl).apply {
+            val httpPost = HttpPost(url).apply {
                 addHeader("Content-Type", "application/json")
                 entity = StringEntity(
-                    objectMapper.writeValueAsString(DoorayNotificationRequest(botName = "My Noti", text = message)),
-                    Charset.forName("UTF-8")
+                    objectMapper.writeValueAsString(
+                        DoorayNotificationRequest(
+                            botName = "My Noti",
+                            text = title + "\n" + message
+                        )
+                    ), Charset.forName("UTF-8")
                 )
             }
             httpClient.execute(httpPost).use { httpResponse ->

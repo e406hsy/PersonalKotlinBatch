@@ -1,7 +1,8 @@
 package com.soonyong.hong.batch.crawl.job
 
 import com.soonyong.hong.batch.crawl.service.CrawlService
-import com.soonyong.hong.batch.notification.dooray.service.DoorayNotificationService
+import com.soonyong.hong.batch.notification.domain.NotificationServiceFactory
+import com.soonyong.hong.batch.notification.domain.NotificationType
 import mu.KotlinLogging
 import org.springframework.batch.core.StepContribution
 import org.springframework.batch.core.configuration.annotation.StepScope
@@ -17,23 +18,30 @@ private val log = KotlinLogging.logger {}
 @StepScope
 @Component
 class WebCrawlTasklet(
-    private val crawlService: CrawlService, private val doorayNotificationService: DoorayNotificationService
+    private val crawlService: CrawlService,
+    private val notificationServiceFactory: NotificationServiceFactory
 ) : Tasklet {
 
     @Value("#{jobParameters[title]}")
     private lateinit var title: String
 
-    @Value("#{jobParameters[hookUrl]}")
-    private lateinit var hookUrl: String
+    @Value("#{jobParameters[url]}")
+    private lateinit var url: String
+
+    @Value("#{jobParameters[type]")
+    private lateinit var type: NotificationType
 
     override fun execute(contribution: StepContribution, chunkContext: ChunkContext): RepeatStatus {
         val result: List<String> = crawlService.getTexts(title)
 
         log.info("crawl result : {}", result)
 
-        if (result.isNotEmpty() && this::hookUrl.isInitialized && StringUtils.hasText(hookUrl)) {
+        if (result.isNotEmpty() && this::url.isInitialized && this::type.isInitialized && StringUtils.hasText(
+                url
+            )
+        ) {
 
-            doorayNotificationService.notify(hookUrl, result.joinToString("\n"))
+            notificationServiceFactory.get(type).notify(url, title, result.joinToString("\n"))
         }
         return RepeatStatus.FINISHED
     }
