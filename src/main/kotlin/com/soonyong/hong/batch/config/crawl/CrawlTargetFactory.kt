@@ -2,6 +2,7 @@ package com.soonyong.hong.batch.config.crawl
 
 import com.soonyong.hong.batch.crawl.filter.impl.*
 import com.soonyong.hong.batch.crawl.model.CrawlTarget
+import com.soonyong.hong.batch.text.provider.BasicHtmlDocumentProvider
 import java.time.LocalDate
 import java.time.ZoneId
 import java.time.format.DateTimeFormatter
@@ -14,7 +15,7 @@ private val crawlTargetMap: MutableMap<String, CrawlTarget> = HashMap<String, Cr
     put(
         "gift-certificates", CrawlTarget(
             title = "gift-certificates",
-            url = "https://www.algumon.com/category/5",
+            htmlDocumentProvider = BasicHtmlDocumentProvider("https://www.algumon.com/category/5"),
             baseCssSelector = ".main .product .product-body",
             filter = CrawlFilterChain(
                 delegate = SelectedTextFilterAdapter(
@@ -38,17 +39,20 @@ private val crawlTargetMap: MutableMap<String, CrawlTarget> = HashMap<String, Cr
     put(
         "ppomppu", CrawlTarget(
             title = "ppomppu",
-            url = "https://www.ppomppu.co.kr/zboard/zboard.php?id=ppomppu&hotlist_flag=999",
+            htmlDocumentProvider = BasicHtmlDocumentProvider("https://www.ppomppu.co.kr/zboard/zboard.php?id=ppomppu&hotlist_flag=999"),
             baseCssSelector = "#revolution_main_table > tbody > tr[align=\"center\"]",
             filter = CrawlFilterChain(
                 delegate = SelectedTextFilterAdapter(
                     comparator = PatternMatchStringComparator(
                         pattern = Pattern.compile("^((?!/zboard/skin/DQ_Revolution_BBS_New1/end_icon\\.PNG).)*$")
                     )
-                ), delegateCondition = CrawlFilterChain.DelegateCondition.AND, next = CrawlFilterChain(
+                ),
+                delegateCondition = CrawlFilterChain.DelegateCondition.AND,
+                next = CrawlFilterChain(
                     delegate = CrawlFilterChain(
                         delegate = SelectedTextFilterAdapter(
-                            cssSelector = "td:nth-child(4) > nobr", comparator = PatternMatchStringComparator(
+                            cssSelector = "td:nth-child(4) > nobr",
+                            comparator = PatternMatchStringComparator(
                                 pattern = Pattern.compile("\\d\\d:\\d\\d:\\d\\d")
                             ).and(
                                 LocalTimeBaseStringComparator(
@@ -79,17 +83,20 @@ private val crawlTargetMap: MutableMap<String, CrawlTarget> = HashMap<String, Cr
     put(
         "ppomppu_foreign", CrawlTarget(
             title = "ppomppu_foreign",
-            url = "https://www.ppomppu.co.kr/zboard/zboard.php?id=ppomppu4&hotlist_flag=999",
+            htmlDocumentProvider = BasicHtmlDocumentProvider("https://www.ppomppu.co.kr/zboard/zboard.php?id=ppomppu4&hotlist_flag=999"),
             baseCssSelector = "#revolution_main_table > tbody > tr[align=\"center\"]",
             filter = CrawlFilterChain(
                 delegate = SelectedTextFilterAdapter(
                     comparator = PatternMatchStringComparator(
                         pattern = Pattern.compile("^((?!/zboard/skin/DQ_Revolution_BBS_New1/end_icon\\.PNG).)*$")
                     )
-                ), delegateCondition = CrawlFilterChain.DelegateCondition.AND, next = CrawlFilterChain(
+                ),
+                delegateCondition = CrawlFilterChain.DelegateCondition.AND,
+                next = CrawlFilterChain(
                     delegate = CrawlFilterChain(
                         delegate = SelectedTextFilterAdapter(
-                            cssSelector = "td:nth-child(4) > nobr", comparator = PatternMatchStringComparator(
+                            cssSelector = "td:nth-child(4) > nobr",
+                            comparator = PatternMatchStringComparator(
                                 pattern = Pattern.compile("\\d\\d:\\d\\d:\\d\\d")
                             )
                         ), delegateCondition = CrawlFilterChain.DelegateCondition.AND, next = SelectedTextFilterAdapter(
@@ -124,14 +131,16 @@ private val crawlTargetMap: MutableMap<String, CrawlTarget> = HashMap<String, Cr
     put(
         "quasarzone", CrawlTarget(
             title = "quasarzone",
-            url = "https://quasarzone.com/bbs/qb_saleinfo?popularity=Y",
+            htmlDocumentProvider = BasicHtmlDocumentProvider("https://quasarzone.com/bbs/qb_saleinfo?popularity=Y"),
             baseCssSelector = "#frmSearch > div > div.list-board-wrap > div.market-type-list.market-info-type-list.relative > table > tbody > tr",
             filter = CrawlFilterChain(
                 delegate = SelectedTextFilterAdapter(
                     comparator = PatternMatchStringComparator(
                         pattern = Pattern.compile("^((?!종료).)*$")
                     )
-                ), delegateCondition = CrawlFilterChain.DelegateCondition.AND, next = CrawlFilterChain(
+                ),
+                delegateCondition = CrawlFilterChain.DelegateCondition.AND,
+                next = CrawlFilterChain(
                     delegate = SelectedTextFilterAdapter(
                         cssSelector = "span.date", comparator = PatternMatchStringComparator(
                             pattern = Pattern.compile("\\d\\d:\\d\\d")
