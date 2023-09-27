@@ -35,7 +35,7 @@ class GotifyNotificationService : NotificationService {
         entity = StringEntity(
           objectMapper.writeValueAsString(
             GotifyMessage(
-              title = message.title, message = message.body
+              title = message.title, message = message.body, priority = 5
             )
           ), Charset.forName("UTF-8")
         )
