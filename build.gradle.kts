@@ -27,7 +27,7 @@ dependencies {
     implementation("org.jetbrains.kotlin:kotlin-stdlib-jdk8")
 
     /** jackson kotlin **/
-    implementation("com.fasterxml.jackson.module:jackson-module-kotlin:2.13.0")
+    implementation("com.fasterxml.jackson.module:jackson-module-kotlin:2.15.2")
 
     /** spring **/
     implementation("org.springframework.boot:spring-boot-starter-batch")
@@ -42,7 +42,7 @@ dependencies {
     implementation("org.apache.httpcomponents:httpclient:4.5.13")
 
     /** jsoup **/
-    implementation("org.jsoup:jsoup:1.14.3")
+    implementation("org.jsoup:jsoup:1.16.1")
 
     /** log **/
     implementation("io.github.microutils:kotlin-logging:1.12.5")
