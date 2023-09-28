@@ -33,16 +33,15 @@ class WebCrawlTasklet(
   private lateinit var type: NotificationType
 
   override fun execute(contribution: StepContribution, chunkContext: ChunkContext): RepeatStatus {
-    val results: List<String> = crawlService.getTexts(title)
+    val result: String = crawlService.getText(title)
 
-    log.info("crawl result : {}", results)
+    log.info("crawl result : {}", result)
 
-    if (results.isNotEmpty() && this::key.isInitialized && this::type.isInitialized && StringUtils.hasText(
+    if (result.isNotEmpty() && this::key.isInitialized && this::type.isInitialized && StringUtils.hasText(
         key
       )
     ) {
-      notificationServiceFactory.get(type)
-        .notify(key, NotificationMessage(title, results.joinToString("\n")))
+      notificationServiceFactory.get(type).notify(key, NotificationMessage(title, result))
     }
     return RepeatStatus.FINISHED
   }

@@ -1,6 +1,7 @@
 package com.soonyong.hong.batch.crawl.service
 
 import com.soonyong.hong.batch.crawl.model.CrawlTarget
+import com.soonyong.hong.batch.provider.text.WebCrawler
 import mu.KotlinLogging
 import org.junit.jupiter.api.Test
 

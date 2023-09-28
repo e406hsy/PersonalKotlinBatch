@@ -1,4 +1,4 @@
-package com.soonyong.hong.batch.text.provider
+package com.soonyong.hong.batch.provider.document
 
 import org.jsoup.nodes.Document
 
