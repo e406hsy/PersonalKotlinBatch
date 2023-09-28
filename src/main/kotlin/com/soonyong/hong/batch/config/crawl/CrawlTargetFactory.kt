@@ -3,9 +3,7 @@ package com.soonyong.hong.batch.config.crawl
 import com.soonyong.hong.batch.crawl.filter.impl.*
 import com.soonyong.hong.batch.crawl.model.CrawlTarget
 import com.soonyong.hong.batch.provider.document.BasicHtmlDocumentProvider
-import com.soonyong.hong.batch.provider.text.TextProvider
-import com.soonyong.hong.batch.provider.text.TextsToCombinedTextProvider
-import com.soonyong.hong.batch.provider.text.WebCrawler
+import com.soonyong.hong.batch.provider.text.*
 import java.time.LocalDate
 import java.time.ZoneId
 import java.time.format.DateTimeFormatter
@@ -20,19 +18,43 @@ private val crawlTargetMap: MutableMap<String, TextProvider> =
       "gift-certificates", basicTextProvider(
         CrawlTarget(
           title = "gift-certificates",
-          htmlDocumentProvider = BasicHtmlDocumentProvider("https://www.algumon.com/category/5"),
-          baseCssSelector = ".main .product .product-body",
+          htmlDocumentProvider = BasicHtmlDocumentProvider(
+            TextsToCombinedTextProvider(
+              TextProvidersToTextsProvider(
+                SimpleTextProvider("https://www.algumon.com/category/5/more/0?types=TYPE_ENDED&topSequence="),
+                TextsToSelectedTextProvider(
+                  textsProvider = RegexFilteredTextsProvider(
+                    textProvider = TextsToSelectedTextProvider(
+                      RegexFilteredTextsProvider(
+                        textProvider = DocumentToTextProvider(BasicHtmlDocumentProvider("https://www.algumon.com/category/5")),
+                        regex = Regex("var\\s+topSequence\\s*=\\s*\\d+")
+                      ), index = 0
+                    ), regex = Regex("\\d+")
+                  ), index = 0
+                )
+              ), delimiter = ""
+            ).getText()
+          ),
+          baseCssSelector = ".product-body",
           filter = CrawlFilterChain(
-            delegate = SelectedTextFilterAdapter(
-              cssSelector = ".deal-title .item-name", comparator = PatternMatchStringComparator(
-                pattern = Pattern.compile("컬쳐랜드|문화상품권|해피머니|북앤라이프")
+            CrawlFilterChain(
+              delegate = SelectedTextFilterAdapter(
+                cssSelector = ".deal-title .item-name", comparator = PatternMatchStringComparator(
+                  pattern = Pattern.compile("컬쳐랜드|문화상품권|해피머니|북앤라이프")
+                )
+              ),
+              delegateCondition = CrawlFilterChain.DelegateCondition.AND,
+              next = SelectedTextFilterAdapter(
+                cssSelector = ".product-body .product-price",
+                comparator = PatternMatchStringComparator(
+                  pattern = Pattern.compile("(46,?[01][0-9]{2}|46,?200)\\s*원")
+                )
               )
             ),
             delegateCondition = CrawlFilterChain.DelegateCondition.AND,
             next = SelectedTextFilterAdapter(
-              cssSelector = ".product-body .product-price",
-              comparator = PatternMatchStringComparator(
-                pattern = Pattern.compile("(46,?[01][0-9]{2}|46,?200)\\s*원")
+              cssSelector = ".header .label-time", comparator = PatternMatchStringComparator(
+                pattern = Pattern.compile("방금|\\D\\d분 전|10분 전")
               )
             )
           ),
