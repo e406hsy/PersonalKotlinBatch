@@ -33,7 +33,7 @@ private val crawlTargetMap: MutableMap<String, TextProvider> =
                   ), index = 0
                 )
               ), delimiter = ""
-            ).getText()
+            )
           ),
           baseCssSelector = ".product-body",
           filter = CrawlFilterChain(
