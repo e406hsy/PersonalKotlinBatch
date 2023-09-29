@@ -21,7 +21,7 @@ class RemoveSpringBatchHistoryTasklet : Tasklet, InitializingBean {
   private var tablePrefix = DEFAULT_TABLE_PREFIX
   private var historicRetentionMonth = DEFAULT_RETENTION_MONTH
   private var jdbcTemplate: JdbcTemplate? = null
-  override fun execute(contribution: StepContribution, chunkContext: ChunkContext): RepeatStatus? {
+  override fun execute(contribution: StepContribution, chunkContext: ChunkContext): RepeatStatus {
     var totalCount = 0
     val date = LocalDate.now().minusDays(historicRetentionMonth.toLong())
     var rowCount = jdbcTemplate!!.update(getQuery(SQL_DELETE_BATCH_STEP_EXECUTION_CONTEXT), date)
