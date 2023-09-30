@@ -17,10 +17,10 @@ private val LOG = KotlinLogging.logger {}
 
 
 @Component
-class RemoveSpringBatchHistoryTasklet : Tasklet, InitializingBean {
+class RemoveSpringBatchHistoryTasklet(private val jdbcTemplate: JdbcTemplate) : Tasklet, InitializingBean {
   private var tablePrefix = DEFAULT_TABLE_PREFIX
   private var historicRetentionMonth = DEFAULT_RETENTION_MONTH
-  private var jdbcTemplate: JdbcTemplate? = null
+  
   override fun execute(contribution: StepContribution, chunkContext: ChunkContext): RepeatStatus? {
     var totalCount = 0
     val date = LocalDate.now().minusDays(historicRetentionMonth.toLong())
@@ -56,10 +56,6 @@ class RemoveSpringBatchHistoryTasklet : Tasklet, InitializingBean {
 
   fun setHistoricRetentionMonth(historicRetentionMonth: Int) {
     this.historicRetentionMonth = historicRetentionMonth
-  }
-
-  fun setJdbcTemplate(jdbcTemplate: JdbcTemplate?) {
-    this.jdbcTemplate = jdbcTemplate
   }
 
   @Throws(Exception::class)
