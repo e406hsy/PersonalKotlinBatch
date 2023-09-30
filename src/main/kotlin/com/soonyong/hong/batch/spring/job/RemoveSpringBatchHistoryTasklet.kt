@@ -17,7 +17,7 @@ private val LOG = KotlinLogging.logger {}
 
 
 @Component
-class RemoveSpringBatchHistoryTasklet ( private var jdbcTemplate: JdbcTemplate ) : Tasklet, InitializingBean {
+class RemoveSpringBatchHistoryTasklet ( private val jdbcTemplate: JdbcTemplate ) : Tasklet, InitializingBean {
   private var tablePrefix = DEFAULT_TABLE_PREFIX
   private var historicRetentionMonth = DEFAULT_RETENTION_MONTH
   
