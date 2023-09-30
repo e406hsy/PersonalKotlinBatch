@@ -6,7 +6,6 @@ import org.springframework.batch.core.repository.dao.AbstractJdbcBatchMetadataDa
 import org.springframework.batch.core.scope.context.ChunkContext
 import org.springframework.batch.core.step.tasklet.Tasklet
 import org.springframework.batch.repeat.RepeatStatus
-import org.springframework.beans.factory.InitializingBean
 import org.springframework.jdbc.core.JdbcTemplate
 import org.springframework.stereotype.Component
 import org.springframework.util.Assert
@@ -17,7 +16,7 @@ private val LOG = KotlinLogging.logger {}
 
 
 @Component
-class RemoveSpringBatchHistoryTasklet ( private val jdbcTemplate: JdbcTemplate ) : Tasklet, InitializingBean {
+class RemoveSpringBatchHistoryTasklet ( private val jdbcTemplate: JdbcTemplate ) : Tasklet {
   private var tablePrefix = DEFAULT_TABLE_PREFIX
   private var historicRetentionMonth = DEFAULT_RETENTION_MONTH
   
