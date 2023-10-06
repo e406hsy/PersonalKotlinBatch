@@ -6,7 +6,6 @@ import org.springframework.batch.core.repository.dao.AbstractJdbcBatchMetadataDa
 import org.springframework.batch.core.scope.context.ChunkContext
 import org.springframework.batch.core.step.tasklet.Tasklet
 import org.springframework.batch.repeat.RepeatStatus
-import org.springframework.beans.factory.InitializingBean
 import org.springframework.jdbc.core.JdbcTemplate
 import org.springframework.stereotype.Component
 import org.springframework.util.Assert
@@ -17,29 +16,29 @@ private val LOG = KotlinLogging.logger {}
 
 
 @Component
-class RemoveSpringBatchHistoryTasklet(private val jdbcTemplate: JdbcTemplate) : Tasklet, InitializingBean {
+class RemoveSpringBatchHistoryTasklet ( private val jdbcTemplate: JdbcTemplate ) : Tasklet {
   private var tablePrefix = DEFAULT_TABLE_PREFIX
   private var historicRetentionMonth = DEFAULT_RETENTION_MONTH
   
-  override fun execute(contribution: StepContribution, chunkContext: ChunkContext): RepeatStatus? {
+  override fun execute(contribution: StepContribution, chunkContext: ChunkContext): RepeatStatus {
     var totalCount = 0
     val date = LocalDate.now().minusDays(historicRetentionMonth.toLong())
-    var rowCount = jdbcTemplate!!.update(getQuery(SQL_DELETE_BATCH_STEP_EXECUTION_CONTEXT), date)
+    var rowCount = jdbcTemplate.update(getQuery(SQL_DELETE_BATCH_STEP_EXECUTION_CONTEXT), date)
     LOG.info("Deleted rows number from the BATCH_STEP_EXECUTION_CONTEXT table: {}", rowCount)
     totalCount += rowCount
-    rowCount = jdbcTemplate!!.update(getQuery(SQL_DELETE_BATCH_STEP_EXECUTION), date)
+    rowCount = jdbcTemplate.update(getQuery(SQL_DELETE_BATCH_STEP_EXECUTION), date)
     LOG.info("Deleted rows number from the BATCH_STEP_EXECUTION table: {}", rowCount)
     totalCount += rowCount
-    rowCount = jdbcTemplate!!.update(getQuery(SQL_DELETE_BATCH_JOB_EXECUTION_CONTEXT), date)
+    rowCount = jdbcTemplate.update(getQuery(SQL_DELETE_BATCH_JOB_EXECUTION_CONTEXT), date)
     LOG.info("Deleted rows number from the BATCH_JOB_EXECUTION_CONTEXT table: {}", rowCount)
     totalCount += rowCount
-    rowCount = jdbcTemplate!!.update(getQuery(SQL_DELETE_BATCH_JOB_EXECUTION_PARAMS), date)
+    rowCount = jdbcTemplate.update(getQuery(SQL_DELETE_BATCH_JOB_EXECUTION_PARAMS), date)
     LOG.info("Deleted rows number from the BATCH_JOB_EXECUTION_PARAMS table: {}", rowCount)
     totalCount += rowCount
-    rowCount = jdbcTemplate!!.update(getQuery(SQL_DELETE_BATCH_JOB_EXECUTION), date)
+    rowCount = jdbcTemplate.update(getQuery(SQL_DELETE_BATCH_JOB_EXECUTION), date)
     LOG.info("Deleted rows number from the BATCH_JOB_EXECUTION table: {}", rowCount)
     totalCount += rowCount
-    rowCount = jdbcTemplate!!.update(getQuery(SQL_DELETE_BATCH_JOB_INSTANCE))
+    rowCount = jdbcTemplate.update(getQuery(SQL_DELETE_BATCH_JOB_INSTANCE))
     LOG.info("Deleted rows number from the BATCH_JOB_INSTANCE table: {}", rowCount)
     totalCount += rowCount
     contribution.incrementWriteCount(totalCount)
@@ -56,11 +55,6 @@ class RemoveSpringBatchHistoryTasklet(private val jdbcTemplate: JdbcTemplate) : 
 
   fun setHistoricRetentionMonth(historicRetentionMonth: Int) {
     this.historicRetentionMonth = historicRetentionMonth
-  }
-
-  @Throws(Exception::class)
-  override fun afterPropertiesSet() {
-    Assert.notNull(jdbcTemplate, "The jdbcTemplate must not be null")
   }
 
   companion object {
