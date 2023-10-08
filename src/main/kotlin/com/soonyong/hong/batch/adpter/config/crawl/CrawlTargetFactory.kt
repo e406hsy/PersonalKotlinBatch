@@ -40,7 +40,7 @@ private val crawlTargetMap: MutableMap<String, TextProvider> =
             CrawlFilterChain(
               delegate = SelectedTextFilterAdapter(
                 cssSelector = ".deal-title .item-name", comparator = PatternMatchStringComparator(
-                  pattern = Pattern.compile("(컬쳐랜드|문화상품권|해피머니|북앤라이프)")
+                  pattern = Pattern.compile(".*(컬쳐랜드|문화상품권|해피머니|북앤라이프).*")
                 )
               ),
               delegateCondition = CrawlFilterChain.DelegateCondition.AND,
@@ -54,7 +54,7 @@ private val crawlTargetMap: MutableMap<String, TextProvider> =
             delegateCondition = CrawlFilterChain.DelegateCondition.AND,
             next = SelectedTextFilterAdapter(
               cssSelector = ".header .label-time", comparator = PatternMatchStringComparator(
-                pattern = Pattern.compile("(방금|\\D\\d분 전|1[01]분 전)")
+                pattern = Pattern.compile("^(\\D)*(방금|\\d분\\s+전|1[01]분\\s+전).*")
               )
             )
           ),

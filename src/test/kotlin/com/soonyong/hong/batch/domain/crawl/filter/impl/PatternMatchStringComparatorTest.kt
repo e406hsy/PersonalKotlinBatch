@@ -23,4 +23,13 @@ internal class PatternMatchStringComparatorTest {
         assertFalse(patternMatchStringComparator.test("123aaa"))
         assertFalse(patternMatchStringComparator.test("aaa"))
     }
+
+
+    @Test
+    internal fun testMatching() {
+        val patternMatchStringComparator = PatternMatchStringComparator(
+            pattern = Pattern.compile("^\\D*(방금|\\d분 전|1[01]분 전|\\d{1,2}시간 전).*")
+        )
+        assertTrue(patternMatchStringComparator.test("8분 전"))
+    }
 }
