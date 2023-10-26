@@ -54,7 +54,7 @@ private val crawlTargetMap: MutableMap<String, TextProvider> =
             delegateCondition = CrawlFilterChain.DelegateCondition.AND,
             next = SelectedTextFilterAdapter(
               cssSelector = ".header .label-time", comparator = PatternMatchStringComparator(
-                pattern = Pattern.compile("^(\\D)*(방금|\\d분\\s+전|1[01]분\\s+전).*")
+                pattern = Pattern.compile("^(\\D)*(방금|\\d분\\s*전|1[01]분\\s*전).*")
               )
             )
           ),
