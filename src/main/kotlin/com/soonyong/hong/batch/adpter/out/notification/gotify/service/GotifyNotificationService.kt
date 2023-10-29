@@ -9,11 +9,15 @@ import com.soonyong.hong.batch.domain.notification.domain.model.NotificationMess
 import mu.KotlinLogging
 import org.apache.http.HttpException
 import org.apache.http.client.methods.HttpPost
+import org.apache.http.conn.ssl.SSLConnectionSocketFactory
+import org.apache.http.conn.ssl.TrustSelfSignedStrategy
 import org.apache.http.entity.StringEntity
 import org.apache.http.impl.client.HttpClients
+import org.apache.http.ssl.SSLContextBuilder
 import org.springframework.stereotype.Service
 import java.io.IOException
 import java.nio.charset.Charset
+
 
 private val log = KotlinLogging.logger {}
 private val objectMapper = ObjectMapper().apply {
@@ -29,7 +33,15 @@ class GotifyNotificationService : NotificationService {
   @Throws(IOException::class, HttpException::class)
   override fun notify(url: String, message: NotificationMessage) {
     log.info { "notification requested with message $message" }
-    HttpClients.createMinimal().use { httpClient ->
+    SSLContextBuilder().loadTrustMaterial(null, TrustSelfSignedStrategy()).build().let {
+      SSLConnectionSocketFactory(
+        it
+      )
+    }.let {
+      HttpClients.custom().setSSLSocketFactory(
+        it
+      )
+    }.build().use { httpClient ->
       val httpPost = HttpPost(url).apply {
         addHeader("Content-Type", "application/json")
         entity = StringEntity(
