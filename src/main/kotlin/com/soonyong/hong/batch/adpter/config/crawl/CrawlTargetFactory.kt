@@ -40,21 +40,21 @@ private val crawlTargetMap: MutableMap<String, TextProvider> =
             CrawlFilterChain(
               delegate = SelectedTextFilterAdapter(
                 cssSelector = ".deal-title .item-name", comparator = PatternMatchStringComparator(
-                  pattern = Pattern.compile(".*(컬쳐랜드|문화상품권|해피머니|북앤라이프).*")
+                  pattern = Pattern.compile(".*(컬쳐랜드|컬처랜드|문화상품권|해피머니|북앤라이프).*")
                 )
               ),
               delegateCondition = CrawlFilterChain.DelegateCondition.AND,
               next = SelectedTextFilterAdapter(
                 cssSelector = ".product-body .product-price",
                 comparator = PatternMatchStringComparator(
-                  pattern = Pattern.compile("(46,?[01][0-9]{2}|46,?200)\\s*원")
+                  pattern = Pattern.compile("(4[0-5],?[0-9]{3}|46,?([01][0-9]{2}|200))\\s*원")
                 )
               )
             ),
             delegateCondition = CrawlFilterChain.DelegateCondition.AND,
             next = SelectedTextFilterAdapter(
               cssSelector = ".header .label-time", comparator = PatternMatchStringComparator(
-                pattern = Pattern.compile("^(\\D)*(방금|\\d분\\s*전|1[01]분\\s*전).*")
+                pattern = Pattern.compile("^(\\D)*(방금|0?\\d분\\s*전|1[01]분\\s*전).*")
               )
             )
           ),
