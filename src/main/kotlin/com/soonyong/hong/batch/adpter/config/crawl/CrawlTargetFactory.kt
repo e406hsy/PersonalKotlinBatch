@@ -47,7 +47,7 @@ private val crawlTargetMap: MutableMap<String, TextProvider> =
               next = SelectedTextFilterAdapter(
                 cssSelector = ".product-body .product-price",
                 comparator = PatternMatchStringComparator(
-                  pattern = Pattern.compile("(4[0-5],?[0-9]{3}|46,?([01][0-9]{2}|2([0-4][0-9]|50)))\\s*원")
+                  pattern = Pattern.compile("(4[0-5],?[0-9]{3}|9,200|46,?([0-4][0-9]{2}|5([0-4][0-9]|50)))\\s*원")
                 )
               )
             ),
