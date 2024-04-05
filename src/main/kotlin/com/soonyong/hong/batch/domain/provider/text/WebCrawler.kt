@@ -20,7 +20,9 @@ class WebCrawler(private val target: CrawlTarget) : TextsProvider {
 
       elements.filter { element: Element -> target.filter.isAllowed(element) }
         .map { element: Element ->
-          target.targetTextSelector.filterText(element)
+          val filterText = target.targetTextSelector.filterText(element)
+          log.debug { "from Element : $element extracted $filterText" }
+          filterText
         }
 
     } catch (e: IOException) {
