@@ -8,6 +8,7 @@ import com.soonyong.hong.batch.domain.notification.domain.NotificationService
 import com.soonyong.hong.batch.domain.notification.domain.model.NotificationMessage
 import mu.KotlinLogging
 import org.apache.http.HttpException
+import org.apache.http.client.config.RequestConfig
 import org.apache.http.client.methods.HttpPost
 import org.apache.http.conn.ssl.SSLConnectionSocketFactory
 import org.apache.http.conn.ssl.TrustSelfSignedStrategy
@@ -51,6 +52,7 @@ class GotifyNotificationService : NotificationService {
             )
           ), Charset.forName("UTF-8")
         )
+        config = RequestConfig.custom().setConnectTimeout(5000).setSocketTimeout(5000).setSocketTimeout(5000).build()
       }
       httpClient.execute(httpPost).use { httpResponse ->
         if (httpResponse.statusLine.statusCode != 200) {

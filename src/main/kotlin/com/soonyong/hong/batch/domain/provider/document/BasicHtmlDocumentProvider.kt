@@ -9,7 +9,7 @@ class BasicHtmlDocumentProvider(private val urlProvider: TextProvider) : HtmlDoc
 
   constructor(url: String) : this(SimpleTextProvider(url))
 
-  override fun getDocument(): Document = Jsoup.connect(urlProvider.getText()).get()
+  override fun getDocument(): Document = Jsoup.connect(urlProvider.getText()).timeout(5000).get()
   override fun toString(): String {
     return "BasicHtmlDocumentProvider(urlProvider='$urlProvider')"
   }
