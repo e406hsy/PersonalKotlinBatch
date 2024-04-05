@@ -105,7 +105,7 @@ private val crawlTargetMap: MutableMap<String, TextProvider> =
             )
           ),
           targetTextSelector = CssSelectorTargetTextSelector(
-            "td:nth-child(3) > table > tbody > tr > td:nth-child(2) > div > a > font"
+            "td:nth-child(3) .baseList-title span"
           )
         )
       )

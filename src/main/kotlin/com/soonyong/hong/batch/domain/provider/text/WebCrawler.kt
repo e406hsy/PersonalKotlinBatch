@@ -18,8 +18,11 @@ class WebCrawler(private val target: CrawlTarget) : TextsProvider {
       val document = target.htmlDocumentProvider.getDocument()
       val elements: Elements = document.select(target.baseCssSelector)
 
-      elements.filter { element: Element -> target.filter.isAllowed(element) }
-        .map { element: Element ->
+      elements.filter { element: Element ->
+        val allowed = target.filter.isAllowed(element)
+        log.debug { "Element : $element allowed status = $allowed" }
+        allowed
+      }.map { element: Element ->
           val filterText = target.targetTextSelector.filterText(element)
           log.debug { "from Element : $element extracted $filterText" }
           filterText

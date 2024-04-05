@@ -32,4 +32,13 @@ internal class PatternMatchStringComparatorTest {
         )
         assertTrue(patternMatchStringComparator.test("8분 전"))
     }
+
+
+    @Test
+    internal fun testMatchingTime() {
+        val patternMatchStringComparator = PatternMatchStringComparator(
+            pattern = Pattern.compile("\\d\\d:\\d\\d:\\d\\d")
+        )
+        assertFalse(patternMatchStringComparator.test("24/04/04"))
+    }
 }
