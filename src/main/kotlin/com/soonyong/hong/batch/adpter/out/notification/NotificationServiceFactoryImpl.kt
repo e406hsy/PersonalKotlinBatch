@@ -19,6 +19,7 @@ class NotificationServiceFactoryImpl(private val applicationContext: Application
       NotificationType.DOORAY -> applicationContext.getBean(DoorayNotificationService::class.java)
       NotificationType.GOTIFY -> applicationContext.getBean(GotifyNotificationService::class.java)
       NotificationType.FIREBASE -> applicationContext.getBean(FireBaseAndroidPushNotificationService::class.java)
+      NotificationType.NONE -> object : NotificationService {}
     }
   }
 
