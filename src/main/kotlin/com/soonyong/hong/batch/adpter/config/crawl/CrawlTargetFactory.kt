@@ -33,7 +33,7 @@ private val crawlTargetMap: MutableMap<String, TextProvider> = HashMap<String, T
           return@filter false
         }
         val postCreatedTime = LocalTime.parse(timeText, DateTimeFormatter.ofPattern("HH:mm"))
-        LocalTime.now().minusMinutes(10).isBefore(postCreatedTime) || LocalTime.MIN.plusMinutes(10).isAfter(postCreatedTime)
+        LocalTime.now().minusMinutes(10).isBefore(postCreatedTime) || LocalTime.MIN.plusMinutes(10).isAfter(LocalTime.now())
       }.map { element: Element ->
         element.select("td.subject a").first()?.attr("href")?.let {
           BasicHtmlDocumentProvider(it)
