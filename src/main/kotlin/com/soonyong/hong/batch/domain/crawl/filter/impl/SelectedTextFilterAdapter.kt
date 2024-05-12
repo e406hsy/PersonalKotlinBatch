@@ -13,9 +13,12 @@ private val log = KotlinLogging.logger {}
  * @property comparator 선택된 텍스트를 검증하기 위한 검증자
  */
 class SelectedTextFilterAdapter(
-  private val comparator: Predicate<String>,
-  private val cssSelector: String? = null
+  private val comparator: (String) -> Boolean, private val cssSelector: String? = null
 ) : CrawlFilter {
+
+  constructor(
+    comparator: Predicate<String>, cssSelector: String? = null
+  ) : this(comparator::test, cssSelector)
 
   /**
    * Element가 크롤링이 대상이 되는지 판단
@@ -23,7 +26,7 @@ class SelectedTextFilterAdapter(
    */
   override fun isAllowed(value: Element): Boolean {
     val target = (this.cssSelector?.let { value.select(it).text() } ?: value.text()).trim()
-    val result = comparator.test(target)
+    val result = comparator(target)
     log.debug("is allowed called with selected {} target {} and value {} and result is {}", cssSelector, target, value, result)
     return result
   }
