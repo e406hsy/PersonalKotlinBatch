@@ -72,7 +72,7 @@ private val crawlTargetMap: MutableMap<String, TextProvider> = HashMap<String, T
         val postCreatedTime = LocalTime.parse(timeText, DateTimeFormatter.ofPattern("HH:mm"))
         val postCreatedDateTime = now.withHour(postCreatedTime.hour).withMinute(postCreatedTime.minute)
 
-          now.minusMinutes(10).isBefore(postCreatedDateTime) || (now.hour == 0 && now.minute < 10)
+        now.minusMinutes(10).isBefore(postCreatedDateTime) || (now.hour == 0 && now.minute < 10)
       }.map { element: Element ->
         element.select("td.subject a").first()?.attr("href")?.let {
           BasicHtmlDocumentProvider(it)
@@ -80,8 +80,7 @@ private val crawlTargetMap: MutableMap<String, TextProvider> = HashMap<String, T
       }.toSet().filter {
         it.matches(Regex(".*https://.*"))
       }.joinToString(separator = "\n----------------------------\n")
-    )
-  )
+  })
 
   put(
     "ppomppu", basicTextProvider(
