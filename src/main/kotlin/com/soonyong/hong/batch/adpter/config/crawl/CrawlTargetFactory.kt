@@ -12,6 +12,7 @@ import org.jsoup.nodes.Element
 import java.time.LocalDate
 import java.time.LocalTime
 import java.time.ZoneId
+import java.time.ZonedDateTime
 import java.time.format.DateTimeFormatter
 import java.time.format.DateTimeFormatterBuilder
 import java.time.temporal.ChronoField
@@ -21,19 +22,23 @@ import java.util.regex.Pattern
 private val log = KotlinLogging.logger {}
 private val crawlTargetMap: MutableMap<String, TextProvider> = HashMap<String, TextProvider>().apply {
   put("naver-points",
-    SimpleTextProvider(BasicHtmlDocumentProvider("https://bbs.ruliweb.com/news/board/1020/").getDocument().select("tr.table_body.blocktarget")
-      .filter { element: Element ->
-        log.debug { element }
-        val subject = element.select("td.subject").text().also { log.debug { it } }
-        subject.matches(Regex(".*(\\(|\\[)\\s*네이버\\s*페이\\s*(\\)|\\]).*"))
-      }.filter { element: Element ->
-        val timeText = element.select("td.time").text()
-        log.debug { timeText }
-        if (!timeText.matches(Regex("\\d{1,2}:\\d{1,2}"))) {
-          return@filter false
-        }
-        val postCreatedTime = LocalTime.parse(timeText, DateTimeFormatter.ofPattern("HH:mm"))
-        LocalTime.now().minusMinutes(10).isBefore(postCreatedTime) || LocalTime.MIN.plusMinutes(10).isAfter(LocalTime.now())
+    SimpleTextProvider(
+      BasicHtmlDocumentProvider("https://bbs.ruliweb.com/news/board/1020/").getDocument().select("tr.table_body.blocktarget").asSequence()
+        .filter { element: Element ->
+          log.debug { element }
+          val subject = element.select("td.subject").text().also { log.debug { it } }
+          subject.matches(Regex(".*(\\(|\\[)\\s*네이버\\s*페이\\s*(\\)|\\]).*"))
+        }.filter { element: Element ->
+          val timeText = element.select("td.time").text()
+          log.debug { timeText }
+          if (!timeText.matches(Regex("\\d{1,2}:\\d{1,2}"))) {
+            return@filter false
+          }
+          val now = ZonedDateTime.now().withZoneSameInstant(ZoneId.of("Asia/Seoul"))
+          val postCreatedTime = LocalTime.parse(timeText, DateTimeFormatter.ofPattern("HH:mm"))
+          val postCreatedDateTime = now.withHour(postCreatedTime.hour).withMinute(postCreatedTime.minute)
+
+          now.minusMinutes(10).isBefore(postCreatedDateTime) || (now.hour == 0 && now.minute < 10)
       }.map { element: Element ->
         element.select("td.subject a").first()?.attr("href")?.let {
           BasicHtmlDocumentProvider(it)
