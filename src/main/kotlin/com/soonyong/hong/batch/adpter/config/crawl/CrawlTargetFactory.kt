@@ -3,10 +3,7 @@ package com.soonyong.hong.batch.adpter.config.crawl
 import com.soonyong.hong.batch.domain.crawl.filter.impl.*
 import com.soonyong.hong.batch.domain.crawl.model.CrawlTarget
 import com.soonyong.hong.batch.domain.provider.document.BasicHtmlDocumentProvider
-import com.soonyong.hong.batch.domain.provider.text.SimpleTextProvider
-import com.soonyong.hong.batch.domain.provider.text.TextProvider
-import com.soonyong.hong.batch.domain.provider.text.TextsToCombinedTextProvider
-import com.soonyong.hong.batch.domain.provider.text.WebCrawler
+import com.soonyong.hong.batch.domain.provider.text.*
 import mu.KotlinLogging
 import org.jsoup.nodes.Element
 import java.time.LocalDate
@@ -21,22 +18,59 @@ import java.util.regex.Pattern
 
 private val log = KotlinLogging.logger {}
 private val crawlTargetMap: MutableMap<String, TextProvider> = HashMap<String, TextProvider>().apply {
-  put("naver-points",
-    SimpleTextProvider(
-      BasicHtmlDocumentProvider("https://bbs.ruliweb.com/news/board/1020/").getDocument().select("tr.table_body.blocktarget").asSequence()
-        .filter { element: Element ->
-          log.debug { element }
-          val subject = element.select("td.subject").text().also { log.debug { it } }
-          subject.matches(Regex(".*(\\(|\\[)\\s*네이버\\s*페이\\s*(\\)|\\]).*"))
-        }.filter { element: Element ->
-          val timeText = element.select("td.time").text()
-          log.debug { timeText }
-          if (!timeText.matches(Regex("\\d{1,2}:\\d{1,2}"))) {
-            return@filter false
-          }
-          val now = ZonedDateTime.now().withZoneSameInstant(ZoneId.of("Asia/Seoul"))
-          val postCreatedTime = LocalTime.parse(timeText, DateTimeFormatter.ofPattern("HH:mm"))
-          val postCreatedDateTime = now.withHour(postCreatedTime.hour).withMinute(postCreatedTime.minute)
+  put(
+    "gift-certificates", basicTextProvider(
+      CrawlTarget(
+        title = "gift-certificates", htmlDocumentProvider = BasicHtmlDocumentProvider(
+          TextsToCombinedTextProvider(
+            TextProvidersToTextsProvider(
+              SimpleTextProvider("https://www.algumon.com/category/5/more/0?types=TYPE_ENDED&topSequence="), TextsToSelectedTextProvider(
+                textsProvider = RegexFilteredTextsProvider(
+                  textProvider = TextsToSelectedTextProvider(
+                    RegexFilteredTextsProvider(
+                      textProvider = DocumentToTextProvider(BasicHtmlDocumentProvider("https://www.algumon.com/category/5")),
+                      regex = Regex("var\\s+topSequence\\s*=\\s*\\d+")
+                    ), index = 0
+                  ), regex = Regex("\\d+")
+                ), index = 0
+              )
+            ), delimiter = ""
+          )
+        ), baseCssSelector = ".product-body", filter = CrawlFilterChain(
+          CrawlFilterChain(
+            delegate = SelectedTextFilterAdapter(
+              cssSelector = ".deal-title .item-name", comparator = PatternMatchStringComparator(
+                pattern = Pattern.compile(".*(컬쳐랜드|컬처랜드|문화상품권|해피머니|북앤라이프).*")
+              )
+            ), delegateCondition = CrawlFilterChain.DelegateCondition.AND, next = SelectedTextFilterAdapter(
+              cssSelector = ".product-body .product-price", comparator = PatternMatchStringComparator(
+                pattern = Pattern.compile("(4[0-5],?[0-9]{3}|9,200|46,?([0-4][0-9]{2}|5([0-4][0-9]|50)))\\s*원")
+              )
+            )
+          ), delegateCondition = CrawlFilterChain.DelegateCondition.AND, next = SelectedTextFilterAdapter(
+            cssSelector = ".header .label-time", comparator = PatternMatchStringComparator(
+              pattern = Pattern.compile("^(\\D)*(방금|0?\\d분\\s*전|1[0-2]분\\s*전).*")
+            )
+          )
+        ), targetTextSelector = CssSelectorTargetTextSelector(".deal-header-p .shop, .deal-title .item-name, .deal-price-info")
+      )
+    )
+  )
+  put("naver-points", SimpleTextProvider {
+    BasicHtmlDocumentProvider("https://bbs.ruliweb.com/news/board/1020/").getDocument().select("tr.table_body.blocktarget").asSequence()
+      .filter { element: Element ->
+        log.debug { element }
+        val subject = element.select("td.subject").text().also { log.debug { it } }
+        subject.matches(Regex(".*(\\(|\\[)\\s*네이버\\s*페이\\s*(\\)|\\]).*"))
+      }.filter { element: Element ->
+        val timeText = element.select("td.time").text()
+        log.debug { timeText }
+        if (!timeText.matches(Regex("\\d{1,2}:\\d{1,2}"))) {
+          return@filter false
+        }
+        val now = ZonedDateTime.now().withZoneSameInstant(ZoneId.of("Asia/Seoul"))
+        val postCreatedTime = LocalTime.parse(timeText, DateTimeFormatter.ofPattern("HH:mm"))
+        val postCreatedDateTime = now.withHour(postCreatedTime.hour).withMinute(postCreatedTime.minute)
 
           now.minusMinutes(10).isBefore(postCreatedDateTime) || (now.hour == 0 && now.minute < 10)
       }.map { element: Element ->
