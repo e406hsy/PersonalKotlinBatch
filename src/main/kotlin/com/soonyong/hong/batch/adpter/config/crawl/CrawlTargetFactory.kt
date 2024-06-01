@@ -82,58 +82,42 @@ private val crawlTargetMap: MutableMap<String, TextProvider> = HashMap<String, T
       }.joinToString(separator = "\n----------------------------\n")
   })
 
-  put(
-    "ppomppu", basicTextProvider(
-      CrawlTarget(
-        title = "ppomppu",
-        htmlDocumentProvider = BasicHtmlDocumentProvider("https://www.ppomppu.co.kr/zboard/zboard.php?id=ppomppu&hotlist_flag=999"),
-        baseCssSelector = "#revolution_main_table > tbody > tr[align=\"center\"]",
-        filter = CrawlFilterChain(
-          delegate = SelectedTextFilterAdapter(
-            comparator = PatternMatchStringComparator(
-              pattern = Pattern.compile("^((?!/zboard/skin/DQ_Revolution_BBS_New1/end_icon\\.PNG).)*$")
-            )
-          ), delegateCondition = CrawlFilterChain.DelegateCondition.AND, next = CrawlFilterChain(
-            delegate = CrawlFilterChain(
-              delegate = SelectedTextFilterAdapter(
-                cssSelector = "td:nth-child(4) > nobr", comparator = PatternMatchStringComparator(
-                  pattern = Pattern.compile("\\d\\d:\\d\\d:\\d\\d")
-                ).and(
-                  LocalTimeBaseStringComparator(
-                    formatter = DateTimeFormatter.ofPattern("HH:mm:ss"),
-                    zoneId = ZoneId.of("Asia/Seoul"),
-                    unit = ChronoUnit.HOURS,
-                    interval = 8,
-                    type = LocalTimeBaseStringComparator.Type.BEFORE
-                  )
-                )
-              ), delegateCondition = CrawlFilterChain.DelegateCondition.AND, next = SelectedTextFilterAdapter(
-                cssSelector = "td:nth-child(5)", comparator = PatternMatchStringComparator(
-                  pattern = Pattern.compile("(1[5-9]|[2-9]\\d)\\s*-\\s*0")
-                )
-              )
-            ), delegateCondition = CrawlFilterChain.DelegateCondition.OR, next = SelectedTextFilterAdapter(
-              cssSelector = "td:nth-child(5)", comparator = PatternMatchStringComparator(
-                pattern = Pattern.compile("([3-9]|\\d{2,})\\d\\s*-\\s*0")
-              )
-            )
-          )
-        ),
-        targetTextSelector = CssSelectorTargetTextSelector(
-          "td:nth-child(3) .baseList-title span"
-        )
-      )
-    )
-  )
-  put(
-    "ppomppu_foreign", basicTextProvider(
-      CrawlTarget(
-        title = "ppomppu_foreign",
-        htmlDocumentProvider = BasicHtmlDocumentProvider("https://www.ppomppu.co.kr/zboard/zboard.php?id=ppomppu4&hotlist_flag=999"),
-        baseCssSelector = "#revolution_main_table > tbody > tr[align=\"center\"]",
-        filter = CrawlFilterChain(
-          delegate = SelectedTextFilterAdapter(
-            comparator = PatternMatchStringComparator(
+  put("ppomppu", SimpleTextProvider {
+    BasicHtmlDocumentProvider("https://www.ppomppu.co.kr/zboard/zboard.php?id=ppomppu&hotlist_flag=999").getDocument()
+      .select("#revolution_main_table > tbody > tr[align=\"center\"]")
+      .asSequence()
+      .filter {
+        it.html().also { log.debug { it } }.contains("/zboard/skin/DQ_Revolution_BBS_New1/end_icon.PNG").not()
+      }
+      .filter {
+        val upAndDowns = it.select(".baseList-rec").text().also { log.debug { it } }
+        if (upAndDowns.matches(Regex("([3-9]|\\d{2,})\\d\\s*-\\s*0"))) {
+          return@filter true
+        }
+        if (!upAndDowns.matches(Regex("(1[5-9]|[2-9]\\d)\\s*-\\s*0"))) {
+          return@filter false
+        }
+
+        val timeText = it.select("time.baseList-time").also { log.debug { it } }.text()
+        if (!timeText.matches(Regex("\\d{1,2}:\\d{1,2}:\\d{1,2}"))) {
+          return@filter false
+        }
+        val now = ZonedDateTime.now().withZoneSameInstant(ZoneId.of("Asia/Seoul"))
+        val postCreatedTime = LocalTime.parse(timeText, DateTimeFormatter.ofPattern("HH:mm:ss"))
+        val postCreatedDateTime = now.withHour(postCreatedTime.hour).withMinute(postCreatedTime.minute)
+
+        now.minusHours(8).isBefore(postCreatedDateTime)
+      }
+      .filter { it.select(".baseList-numb").text().matches(Regex("\\d+")) }
+      .map { it.select(".baseList-title span").text() }
+      .joinToString(separator = "\n")
+  })
+
+  put("ppomppu_foreign", basicTextProvider(CrawlTarget(title = "ppomppu_foreign", htmlDocumentProvider = BasicHtmlDocumentProvider(
+    "https://www.ppomppu.co.kr/zboard/zboard.php?id=ppomppu4&hotlist_flag=999"),
+                                                       baseCssSelector = "#revolution_main_table > tbody > tr[align=\"center\"]",
+                                                       filter = CrawlFilterChain(
+                                                         delegate = SelectedTextFilterAdapter(comparator = PatternMatchStringComparator(
               pattern = Pattern.compile("^((?!/zboard/skin/DQ_Revolution_BBS_New1/end_icon\\.PNG).)*$")
             )
           ), delegateCondition = CrawlFilterChain.DelegateCondition.AND, next = CrawlFilterChain(
