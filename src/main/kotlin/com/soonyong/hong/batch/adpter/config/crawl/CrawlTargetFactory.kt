@@ -47,8 +47,8 @@ private val crawlTargetMap: MutableMap<String, TextProvider> = HashMap<String, T
                 pattern = Pattern.compile("(4[0-5],?[0-9]{3}|9,200|46,?([0-4][0-9]{2}|5([0-4][0-9]|50)))\\s*원")
               )
             )
-          ), delegateCondition = CrawlFilterChain.DelegateCondition.AND, next = SelectedTextFilterAdapter(
-            cssSelector = ".header .label-time", comparator = PatternMatchStringComparator(
+          ), delegateCondition = CrawlFilterChain.DelegateCondition.AND, next = SelectedTextFilterAdapter(cssSelector = "small.deal-price-meta-info",
+            comparator = PatternMatchStringComparator(
               pattern = Pattern.compile("^(\\D)*(방금|0?\\d분\\s*전|1[0-2]분\\s*전).*")
             )
           )

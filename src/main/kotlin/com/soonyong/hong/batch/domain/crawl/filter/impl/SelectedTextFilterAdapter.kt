@@ -27,7 +27,7 @@ class SelectedTextFilterAdapter(
   override fun isAllowed(value: Element): Boolean {
     val target = (this.cssSelector?.let { value.select(it).text() } ?: value.text()).trim()
     val result = comparator(target)
-    log.debug("is allowed called with selected {} target {} and value {} and result is {}", cssSelector, target, value, result)
+    log.debug("is allowed called. selected [{}] target:[{}] value:[{}]. result is {}", cssSelector, target, value, result)
     return result
   }
 }
